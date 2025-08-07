@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Bulk Message Sender</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #128C7E;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        textarea, input[type="file"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: #25D366;
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            gap: 15px;
+        }
+
+        .serial-number {
+            background: #25D366;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .phone-number {
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+
+        .whatsapp-link {
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-link:hover {
+            background: #128C7E;
+            transform: scale(1.05);
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .info-box {
+            background: #e8f4fd;
+            color: #0c5460;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #17a2b8;
+        }
+
+            @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .result-item {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .serial-number {
+                order: 1;
+            }
+            
+            .phone-number {
+                order: 2;
+                width: 100%;
+            }
+            
+            .whatsapp-link {
+                order: 3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 WhatsApp Bulk Sender</h1>
+        <p class="subtitle">Send messages to multiple WhatsApp numbers instantly</p>
+
+        <div class="info-box">
+            <strong>📱 How it works:</strong> This tool creates WhatsApp links for each phone number. Clicking "Open WhatsApp" will open WhatsApp (web/app) with your message pre-filled. You can then send it with one click!
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Important Notes:</strong>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>Due to WhatsApp's policies, messages cannot be sent automatically</li>
+                <li>Each WhatsApp link will open in a new tab/window</li>
+                <li>Images must be shared manually in each chat</li>
+                <li>Phone numbers should include country code (e.g., +1234567890)</li>
+            </ul>
+        </div>
+
+        <form id="messageForm">
+            <div class="form-group">
+                <label for="phoneNumbers">Phone Numbers <span class="required">*</span></label>
+                <textarea 
+                    id="phoneNumbers" 
+                    placeholder="Enter phone numbers (one per line)&#10;Example:&#10;+1234567890&#10;+9876543210&#10;1234567890"
+                    required
+                ></textarea>
+                <div class="help-text">
+                    Enter one phone number per line. Include country code (+ is optional). 
+                    Example: +1234567890 or 1234567890
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message <span class="required">*</span></label>
+                <textarea 
+                    id="message" 
+                    placeholder="Type your message here..."
+                    required
+                ></textarea>
+                <div class="help-text">
+                    This message will be pre-filled in WhatsApp for each contact.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="imageFile">Image Attachment (Optional)</label>
+                <input 
+                    type="file" 
+                    id="imageFile" 
+                    accept="image/*"
+                />
+                <div class="help-text">
+                    Select an image to attach. Note: You'll need to manually attach this image in each WhatsApp chat.
+                </div>
+            </div>
+
+            <button type="submit" class="send-button">
+                📱 Generate WhatsApp Links
+            </button>
+        </form>
+
+        <div id="results" class="results">
+            <h3>📋 Generated Links:</h3>
+            <div id="resultsList"></div>
+            <div style="margin-top: 20px; text-align: center; color: #666;">
+                <strong>💡 Tip:</strong> Click "Open WhatsApp" for each number to send your message!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedImage = null;
+
+        document.getElementById('imageFile').addEventListener('change', function(e) {
+            selectedImage = e.target.files[0];
+            if (selectedImage) {
+                console.log('Image selected:', selectedImage.name);
+            }
+        });
+
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const phoneNumbers = document.getElementById('phoneNumbers').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            if (!phoneNumbers || !message) {
+                alert('Please fill in both phone numbers and message fields.');
+                return;
+            }
+
+            generateWhatsAppLinks(phoneNumbers, message);
+        });
+
+        function generateWhatsAppLinks(phoneNumbersText, message) {
+            const phoneNumbers = phoneNumbersText.split('\n')
+                .map(num => num.trim())
+                .filter(num => num.length > 0);
+            
+            if (phoneNumbers.length === 0) {
+                alert('Please enter at least one phone number.');
+                return;
+            }
+
+            const results = document.getElementById('results');
+            const resultsList = document.getElementById('resultsList');
+            
+            resultsList.innerHTML = '';
+
+            phoneNumbers.forEach((phoneNumber, index) => {
+                const cleanNumber = phoneNumber.replace(/[^\d]/g, '');
+                
+                if (cleanNumber.length < 10) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'error';
+                    errorDiv.textContent = `Invalid phone number: ${phoneNumber} (too short)`;
+                    resultsList.appendChild(errorDiv);
+                    return;
+                }
+
+                const whatsappNumber = cleanNumber.startsWith('0') ? cleanNumber.substring(1) : cleanNumber;
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                
+                resultItem.innerHTML = `
+                    <div class="serial-number">${index + 1}</div>
+                    <div class="phone-number">📞 ${phoneNumber}</div>
+                    <a href="${whatsappUrl}" target="_blank" class="whatsapp-link">
+                        🚀 Open WhatsApp
+                    </a>
+                `;
+
+                resultsList.appendChild(resultItem);
+            });
+
+            // Add image reminder if image is selected
+            if (selectedImage) {
+                const imageReminder = document.createElement('div');
+                imageReminder.className = 'warning';
+                imageReminder.style.marginTop = '20px';
+                imageReminder.innerHTML = `
+                    <strong>📸 Image Reminder:</strong> 
+                    You have selected "${selectedImage.name}". 
+                    Please manually attach this image in each WhatsApp chat after opening the links above.
+                `;
+                resultsList.appendChild(imageReminder);
+            }
+
+            results.style.display = 'block';
+            results.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Add some nice animations on load
+        window.addEventListener('load', function() {
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
