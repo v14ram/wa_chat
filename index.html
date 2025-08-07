@@ -177,13 +177,136 @@
             border-left: 4px solid #e74c3c;
         }
 
-        .warning {
-            background: #fff3cd;
-            color: #856404;
+        .batch-controls {
+            background: #f8f9fa;
             padding: 20px;
             border-radius: 10px;
-            margin-bottom: 30px;
-            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+        }
+
+        .batch-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .setting-group label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .setting-group input, .setting-group select {
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .batch-progress {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #25D366, #128C7E);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .batch-status {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .auto-open-btn {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .auto-open-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .auto-open-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .copy-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #138496;
+        }
+
+        .smart-tips {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+            gap: 10px;
+        }
+
+        .tip-icon {
+            font-size: 1.5em;
+            margin-top: 2px;
         }
 
         .info-box {
@@ -239,11 +362,31 @@
         <div class="warning">
             <strong>⚠️ Important Notes:</strong>
             <ul style="margin-top: 10px; margin-left: 20px;">
-                <li>Due to WhatsApp's policies, messages cannot be sent automatically</li>
-                <li>Each WhatsApp link will open in a new tab/window</li>
-                <li>Images must be shared manually in each chat</li>
+                <li>This tool includes smart batch processing to avoid blocks</li>
+                <li>Images will be automatically copied to clipboard for easy pasting</li>
+                <li>Customizable delays help maintain natural sending patterns</li>
                 <li>Phone numbers should include country code (e.g., +1234567890)</li>
             </ul>
+        </div>
+
+        <div class="smart-tips">
+            <h3 style="margin-bottom: 15px;">🚀 Smart Anti-Block Features</h3>
+            <div class="tip-item">
+                <span class="tip-icon">⏱️</span>
+                <div><strong>Smart Delays:</strong> Customizable delays between opening chats (3-30 seconds) to mimic human behavior</div>
+            </div>
+            <div class="tip-item">
+                <span class="tip-icon">📋</span>
+                <div><strong>Auto-Copy:</strong> Your image is automatically copied to clipboard - just paste (Ctrl+V) in each chat</div>
+            </div>
+            <div class="tip-item">
+                <span class="tip-icon">🎯</span>
+                <div><strong>Batch Processing:</strong> Send to contacts in smaller batches with longer breaks between batches</div>
+            </div>
+            <div class="tip-item">
+                <span class="tip-icon">🔄</span>
+                <div><strong>Resume Feature:</strong> Track progress and resume from where you left off</div>
+            </div>
         </div>
 
         <form id="messageForm">
@@ -279,8 +422,61 @@
                     id="imageFile" 
                     accept="image/*"
                 />
+                <div id="imagePreview"></div>
                 <div class="help-text">
-                    Select an image to attach. Note: You'll need to manually attach this image in each WhatsApp chat.
+                    Select an image. It will be automatically copied to your clipboard for easy pasting in WhatsApp chats.
+                </div>
+            </div>
+
+            <div class="batch-controls">
+                <h3 style="margin-bottom: 15px; color: #495057;">🎛️ Smart Batch Settings</h3>
+                <div class="batch-settings">
+                    <div class="setting-group">
+                        <label>Delay Between Chats</label>
+                        <select id="chatDelay">
+                            <option value="3">3 seconds (Fast)</option>
+                            <option value="5" selected>5 seconds (Normal)</option>
+                            <option value="8">8 seconds (Safe)</option>
+                            <option value="12">12 seconds (Very Safe)</option>
+                            <option value="custom">Custom delay</option>
+                        </select>
+                        <input type="number" id="customDelay" min="1" max="60" value="5" style="display:none; margin-top: 5px;" placeholder="Enter seconds">
+                    </div>
+                    <div class="setting-group">
+                        <label>Batch Size</label>
+                        <select id="batchSize">
+                            <option value="5">5 contacts per batch</option>
+                            <option value="10" selected>10 contacts per batch</option>
+                            <option value="15">15 contacts per batch</option>
+                            <option value="20">20 contacts per batch</option>
+                            <option value="0">No batching (all at once)</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Break Between Batches</label>
+                        <select id="batchBreak">
+                            <option value="30">30 seconds</option>
+                            <option value="60" selected>1 minute</option>
+                            <option value="120">2 minutes</option>
+                            <option value="300">5 minutes</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <label>Auto-Open Mode</label>
+                        <select id="autoMode">
+                            <option value="manual">Manual (click each link)</option>
+                            <option value="auto" selected>Auto-open with delays</option>
+                            <option value="batch">Batch auto-open</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="batch-progress">
+                    <div class="batch-status">Ready to start...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div style="font-size: 0.9em; color: #6c757d;" id="progressText">0 of 0 completed</div>
                 </div>
             </div>
 
@@ -300,13 +496,247 @@
 
     <script>
         let selectedImage = null;
+        let autoOpenProcess = null;
+        let currentProgress = 0;
+        let totalLinks = 0;
+        let isPaused = false;
+
+        // Handle custom delay input
+        document.getElementById('chatDelay').addEventListener('change', function(e) {
+            const customInput = document.getElementById('customDelay');
+            if (e.target.value === 'custom') {
+                customInput.style.display = 'block';
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+            }
+        });
 
         document.getElementById('imageFile').addEventListener('change', function(e) {
             selectedImage = e.target.files[0];
             if (selectedImage) {
+                showImagePreview();
                 console.log('Image selected:', selectedImage.name);
             }
         });
+
+        function showImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            if (selectedImage) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(selectedImage);
+                img.className = 'image-preview';
+                img.onload = function() {
+                    URL.revokeObjectURL(img.src);
+                };
+                preview.innerHTML = '';
+                preview.appendChild(img);
+            }
+        }
+
+        async function copyImageToClipboard() {
+            if (!selectedImage) return;
+            
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                return new Promise((resolve) => {
+                    img.onload = async function() {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        
+                        canvas.toBlob(async function(blob) {
+                            try {
+                                await navigator.clipboard.write([
+                                    new ClipboardItem({
+                                        'image/png': blob
+                                    })
+                                ]);
+                                console.log('Image copied to clipboard!');
+                                showNotification('📋 Image copied to clipboard!', 'success');
+                                resolve();
+                            } catch (err) {
+                                console.log('Clipboard API failed, image will need to be manually attached');
+                                showNotification('📋 Please manually attach the image', 'info');
+                                resolve();
+                            }
+                        }, 'image/png');
+                    };
+                    img.src = URL.createObjectURL(selectedImage);
+                });
+            } catch (err) {
+                console.log('Could not copy image to clipboard');
+                showNotification('📋 Please manually attach the image', 'info');
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification(`📋 ${text} copied!`, 'success');
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#25D366' : '#17a2b8'};
+                color: white;
+                border-radius: 10px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+                style.remove();
+            }, 3000);
+        }
+
+        async function startAutoOpen() {
+            if (isPaused) {
+                isPaused = false;
+                showNotification('▶️ Auto-open resumed!', 'success');
+                return;
+            }
+
+            const links = document.querySelectorAll('.whatsapp-link');
+            const chatDelay = getDelay();
+            const batchSize = parseInt(document.getElementById('batchSize').value);
+            const batchBreak = parseInt(document.getElementById('batchBreak').value);
+            const autoMode = document.getElementById('autoMode').value;
+
+            totalLinks = links.length;
+            
+            if (currentProgress >= totalLinks) {
+                showNotification('✅ All contacts completed!', 'success');
+                return;
+            }
+
+            showNotification(`🚀 Starting auto-open with ${chatDelay}s delays...`, 'info');
+            
+            if (batchSize === 0) {
+                // Open all at once
+                await processAllLinks(links, chatDelay);
+            } else {
+                // Process in batches
+                await processBatches(links, chatDelay, batchSize, batchBreak);
+            }
+        }
+
+        async function processAllLinks(links, delay) {
+            for (let i = currentProgress; i < links.length && !isPaused; i++) {
+                links[i].click();
+                updateProgress(i + 1, links.length);
+                
+                if (i < links.length - 1) {
+                    await sleep(delay * 1000);
+                }
+            }
+            
+            if (!isPaused) {
+                showNotification('✅ All links opened!', 'success');
+                if (selectedImage) {
+                    showNotification('📸 Don\'t forget to paste your image in each chat!', 'info');
+                }
+            }
+        }
+
+        async function processBatches(links, delay, batchSize, batchBreak) {
+            const batches = Math.ceil((links.length - currentProgress) / batchSize);
+            
+            for (let batch = Math.floor(currentProgress / batchSize); batch < batches && !isPaused; batch++) {
+                const batchStart = batch * batchSize;
+                const batchEnd = Math.min(batchStart + batchSize, links.length);
+                
+                showNotification(`📦 Processing batch ${batch + 1} of ${batches}...`, 'info');
+                
+                // Process current batch
+                for (let i = Math.max(batchStart, currentProgress); i < batchEnd && !isPaused; i++) {
+                    links[i].click();
+                    updateProgress(i + 1, links.length);
+                    
+                    if (i < batchEnd - 1) {
+                        await sleep(delay * 1000);
+                    }
+                }
+                
+                // Break between batches (except for the last batch)
+                if (batch < batches - 1 && !isPaused) {
+                    showNotification(`⏳ Taking a ${batchBreak}s break before next batch...`, 'info');
+                    await sleep(batchBreak * 1000);
+                }
+            }
+            
+            if (!isPaused) {
+                showNotification('✅ All batches completed!', 'success');
+                if (selectedImage) {
+                    showNotification('📸 Don\'t forget to paste your image in each chat!', 'info');
+                }
+            }
+        }
+
+        function pauseAutoOpen() {
+            isPaused = true;
+            showNotification('⏸️ Auto-open paused', 'info');
+        }
+
+        function resetProgress() {
+            currentProgress = 0;
+            isPaused = false;
+            updateProgress(0, totalLinks);
+            showNotification('🔄 Progress reset', 'info');
+        }
+
+        function updateProgress(current, total) {
+            currentProgress = current;
+            const percentage = total > 0 ? (current / total) * 100 : 0;
+            
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${current} of ${total} completed`;
+            
+            const status = document.querySelector('.batch-status');
+            if (current === total) {
+                status.textContent = '✅ All contacts completed!';
+                status.style.color = '#25D366';
+            } else if (isPaused) {
+                status.textContent = '⏸️ Paused...';
+                status.style.color = '#ffc107';
+            } else {
+                status.textContent = `📱 Opening WhatsApp chats... (${current}/${total})`;
+                status.style.color = '#495057';
+            }
+        }
+
+        function getDelay() {
+            const delaySelect = document.getElementById('chatDelay');
+            if (delaySelect.value === 'custom') {
+                return parseInt(document.getElementById('customDelay').value) || 5;
+            }
+            return parseInt(delaySelect.value);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
 
         document.getElementById('messageForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -358,7 +788,8 @@
                 resultItem.innerHTML = `
                     <div class="serial-number">${index + 1}</div>
                     <div class="phone-number">📞 ${phoneNumber}</div>
-                    <a href="${whatsappUrl}" target="_blank" class="whatsapp-link">
+                    <button class="copy-btn" onclick="copyToClipboard('${phoneNumber}')">📋 Copy</button>
+                    <a href="${whatsappUrl}" target="_blank" class="whatsapp-link" id="link-${index}">
                         🚀 Open WhatsApp
                     </a>
                 `;
@@ -366,20 +797,42 @@
                 resultsList.appendChild(resultItem);
             });
 
-            // Add image reminder if image is selected
+            // Add auto-open controls
+            const controlsDiv = document.createElement('div');
+            controlsDiv.style.textAlign = 'center';
+            controlsDiv.style.marginTop = '20px';
+            controlsDiv.innerHTML = `
+                <button class="auto-open-btn" onclick="startAutoOpen()">
+                    🚀 Start Auto-Open Process
+                </button>
+                <button class="auto-open-btn" onclick="pauseAutoOpen()" style="background: #6c757d;">
+                    ⏸️ Pause
+                </button>
+                <button class="auto-open-btn" onclick="resetProgress()" style="background: #dc3545;">
+                    🔄 Reset
+                </button>
+            `;
+            resultsList.appendChild(controlsDiv);
+
+            // Add image controls if image is selected
             if (selectedImage) {
+                copyImageToClipboard();
                 const imageReminder = document.createElement('div');
-                imageReminder.className = 'warning';
+                imageReminder.className = 'info-box';
                 imageReminder.style.marginTop = '20px';
                 imageReminder.innerHTML = `
-                    <strong>📸 Image Reminder:</strong> 
-                    You have selected "${selectedImage.name}". 
-                    Please manually attach this image in each WhatsApp chat after opening the links above.
+                    <strong>📸 Image Ready!</strong> 
+                    "${selectedImage.name}" has been copied to your clipboard. 
+                    Just paste (Ctrl+V or Cmd+V) in each WhatsApp chat!
+                    <button class="copy-btn" onclick="copyImageToClipboard()" style="margin-left: 15px;">
+                        📋 Copy Image Again
+                    </button>
                 `;
                 resultsList.appendChild(imageReminder);
             }
 
             results.style.display = 'block';
+            document.querySelector('.batch-progress').style.display = 'block';
             results.scrollIntoView({ behavior: 'smooth' });
         }
 
